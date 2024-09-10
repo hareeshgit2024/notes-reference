@@ -38,3 +38,36 @@ The delivery guys don’t know which pizzas are ready, so they keep running to t
 This is what happens when you don’t have an orchestration service in production. Without something like Kubernetes to manage, balance, and keep things running smoothly, you’ve got containers (the pizza makers) running wild, no automatic recovery when things break (like the dropped pizza), and a lot of unhappy customers (users) waiting on their orders. Total disaster!
 </details>
 
+**ARCHITECTURE OVERVIEW**
+
+Kubernetes (K8s) architecture is designed to manage containerized applications efficiently across a cluster of machines. It consists of two primary components: the Control Plane and Worker Nodes.
+
+![image](https://github.com/user-attachments/assets/f3407a1f-7f2e-4831-bb29-4a6039aed3ff)
+
+**Control Plane**: This is the brain of Kubernetes and manages the overall cluster. Key components include:
+
+- API Server: Acts as the gateway for all administrative tasks and interacts with the K8s cluster.
+- etcd: A distributed key-value store that holds the cluster’s configuration data.
+- Scheduler: Assigns containers (Pods) to nodes based on resource availability and requirements.
+- Controller Manager: Monitors the cluster’s state and ensures the desired state matches the actual state.
+
+**Worker Nodes**: These are the machines where containers run. Each node has:
+
+- Kubelet: An agent that communicates with the control plane, ensuring containers are running in Pods.
+- Container Runtime: Runs the containers (e.g., Docker, containerd).
+- Kube-proxy: Handles networking, ensuring communication between Pods.
+- Kubernetes uses a declarative model, where you define the desired state (e.g., number of replicas), and the control plane ensures the cluster achieves and maintains that state, providing scalability, fault tolerance, and automated management.
+
+<details>
+  <summary>Real Life example</summary>
+
+.
+Imagine a food delivery company running a mobile app. Each part of the system—order processing, delivery tracking, and payments—runs as a separate microservice. Kubernetes (K8s) acts as the control center that manages these services across multiple servers (nodes).
+
+In this setup, the Control Plane is like the headquarters. The API Server is the communication hub where all requests pass through. The Scheduler ensures new deliveries (containers) are assigned to the right drivers (nodes) based on available resources. The Controller Manager ensures that if any delivery driver fails, another one is quickly sent out (restarts failed containers). etcd acts as the company's database, storing all operational data like which deliveries are in progress.
+
+On the ground, the Worker Nodes (servers) are the actual drivers. Each driver has a Kubelet (an agent) that makes sure the delivery (service) is running properly. The Container Runtime (like Docker) runs the microservices, while Kube-proxy handles communication between them, ensuring orders flow smoothly from the customer to the restaurant, the delivery, and payment systems.
+
+Kubernetes orchestrates all these moving parts, ensuring smooth operations, scaling up when there’s high demand, and recovering quickly from any issues.
+</details>
+
