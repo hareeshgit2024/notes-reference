@@ -85,4 +85,68 @@ Kubernetes orchestrates all these moving parts, ensuring smooth operations, scal
 - Kubectl : https://kubernetes.io/docs/tasks/tools/
 - Minikube : https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download
 
+**DOCKER - Overview**
+
+https://github.com/hareeshgit2024/notes-reference/blob/dev/docker-notes/docker-notes.md
+
+
+**Minikube**
+
+nstall minikube in windows => https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2Fchocolatey
+
+Command to install minikube using chocolatey => choco install minikube
+Start the minikube server => 
+ minikube start
+ minikube status
+ 
+ minikube docker-env
+
+ ![image](https://github.com/user-attachments/assets/bd54cb02-a0c2-401c-a840-d11e908e477d)
+ if you want your docker CLI to point to the docker daemon, you can run the last command mentioned in the above screenprint.
+
+To view the minikube dashboard => 
+    minikube dashboard
+
+kubectl version --client
+kubectl cluster-info
+
+**POD**
+
+A `Pod` is the smallest deployable unit in Kubernetes, representing one or more containers that share the same network and storage. 
+Each `Container` within a Pod runs a specific application or microservice, isolated from others but able to communicate within the Pod. 
+A `Sidecar (or Helper container)` is a secondary container in the Pod that assists the main container by performing auxiliary tasks, such as logging, monitoring, or proxying. 
+For example, a logging sidecar can capture and send logs while the main container focuses solely on its primary application. Both containers share resources and can work together efficiently.
+
+---
+
+<details>
+  <summary>Real Life example</summary>
+  
+  .
+Imagine a tea shop that has a counter for serving tea and a small station for keeping the shop clean. In Kubernetes, this setup can be thought of as a Pod. The main container is like the tea-serving counter where the actual tea is prepared and served to customers, representing the core application or service.
+
+However, the tea shop also needs a helper—a cleaning station—to ensure the counter stays clean and organized. This helper station is like a Sidecar container in the Pod. The sidecar (or helper) assists by performing tasks like cleaning (logging, monitoring), without interrupting the tea preparation process.
+
+Both the tea counter (main container) and the cleaning station (sidecar) work in the same Pod (shop), sharing the same environment and resources, like water and electricity (network and storage). The combination ensures the tea shop runs smoothly, with the helper taking care of essential background tasks while the main service remains focused on serving customers.  
+</details>
+
+---
+
+![image](https://github.com/user-attachments/assets/1e642b64-61f0-4908-bd72-f98bee037b79)
+
+When a Pod is created or accessed in Kubernetes, several real-time execution steps are involved to run the containers inside it:
+
+**Pod Scheduling**: When a Pod is requested (e.g., via a YAML configuration), the Kubernetes Scheduler identifies a suitable Node based on available resources (CPU, memory) and the Pod's requirements (like affinity or tolerations).
+
+**Container Creation**: Once scheduled, the Kubelet on the assigned Node receives instructions from the API Server to create the Pod. The Kubelet pulls the necessary container images (e.g., from Docker Hub) using the Container Runtime (like Docker or containerd).
+
+**Network Setup**: Kubernetes assigns an IP address to the Pod, and sets up the networking so that containers in the Pod can communicate with each other via localhost. Kube-proxy handles routing so the Pod can communicate with other Pods or services within the cluster.
+
+**Container Startup**: The containers within the Pod start running based on the image's instructions (like entry point or command). They may also share storage volumes if defined in the Pod configuration.
+
+**Monitoring & Health Checks**: The Kubelet continuously monitors the health of the containers, restarting any container that fails or exits unexpectedly, as defined by the Pod's liveness or readiness probes.
+
+**Pod Access**: Once running, the containers can be accessed internally within the cluster or externally (if exposed via a Service or Ingress).
+
+Kubernetes ensures that containers in the Pod remain operational, scaling or restarting as needed.
 
