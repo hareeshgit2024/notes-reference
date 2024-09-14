@@ -237,3 +237,35 @@ kubectl rollout restart deployment/<deployment-name>
 kubectl top pod
 
 ```
+
+We can now connect to the pod and see what is inside the pod and access the file.
+
+```bash
+
+kubectl exec -it webapp sh
+
+kubectl exec [POD] [COMMAND] is DEPRECATED and will be removed in a future version. Use kubectl exec [POD] -- [COMMAND] instead.
+/ # curl http://localhost:80
+sh: curl: not found
+/ # wget http://localhost:80
+Connecting to localhost:80 (127.0.0.1:80)
+index.html           100% |*******************************************************************************************************************************************************************|   585   0:00:00 ETA
+
+/ # cat index.html
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fleet Management</title>
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.png">
+</head>
+<body>
+  <app-root></app-root>
+<script type="text/javascript" src="runtime.js"></script><script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="styles.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="main.js"></script></body>
+</html>
+/ #
+```
