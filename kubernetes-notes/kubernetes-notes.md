@@ -48,7 +48,8 @@ This is what happens when you don’t have an orchestration service in productio
 
 Kubernetes (K8s) architecture is designed to manage containerized applications efficiently across a cluster of machines. It consists of two primary components: the Control Plane and Worker Nodes.
 
-![image](https://github.com/user-attachments/assets/f3407a1f-7f2e-4831-bb29-4a6039aed3ff)
+![image](https://github.com/user-attachments/assets/cde91f56-f162-43d1-84fa-7977321bdff6)
+
 
 **Control Plane**: This is the brain of Kubernetes and manages the overall cluster. Key components include:
 
@@ -92,7 +93,7 @@ https://github.com/hareeshgit2024/notes-reference/blob/dev/docker-notes/docker-n
 
 **Minikube**
 
-nstall minikube in windows => https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2Fchocolatey
+Install minikube in windows => https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2Fchocolatey
 
 Command to install minikube using chocolatey => choco install minikube
 Start the minikube server => 
@@ -114,7 +115,8 @@ kubectl cluster-info
 
 A `Pod` is the smallest deployable unit in Kubernetes, representing one or more containers that share the same network and storage. 
 Each `Container` within a Pod runs a specific application or microservice, isolated from others but able to communicate within the Pod. 
-A `Sidecar (or Helper container)` is a secondary container in the Pod that assists the main container by performing auxiliary tasks, such as logging, monitoring, or proxying. 
+A `Sidecar (or Helper container)` is a secondary container in the Pod that assists the main container by performing auxiliary tasks, such as logging, monitoring, or proxying.
+
 For example, a logging sidecar can capture and send logs while the main container focuses solely on its primary application. Both containers share resources and can work together efficiently.
 
 ---
@@ -122,7 +124,7 @@ For example, a logging sidecar can capture and send logs while the main containe
 <details>
   <summary>Real Life example</summary>
   
-  .
+
 Imagine a tea shop that has a counter for serving tea and a small station for keeping the shop clean. In Kubernetes, this setup can be thought of as a Pod. The main container is like the tea-serving counter where the actual tea is prepared and served to customers, representing the core application or service.
 
 However, the tea shop also needs a helper—a cleaning station—to ensure the counter stays clean and organized. This helper station is like a Sidecar container in the Pod. The sidecar (or helper) assists by performing tasks like cleaning (logging, monitoring), without interrupting the tea preparation process.
@@ -150,3 +152,85 @@ When a Pod is created or accessed in Kubernetes, several real-time execution ste
 
 Kubernetes ensures that containers in the Pod remain operational, scaling or restarting as needed.
 
+**Writing a POD**
+
+Get ready to start writing for creating a pod.
+
+First let's make sure the minikube is up and running with command `minikube status`.
+
+List all details which we have defined within the kubernetes cluster `kubectl get all`
+
+On executing this command, we get the following `service/kubernetes` which the Rest API exposed by the kubernetes cluster.
+Whenever we trigger a kubectl command, kubectl is automatically posting the command to this API rest endpoints. 
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp  
+spec:
+  containers:
+  - name: webapp
+    image: richardchesterwood/k8s-fleetman-webapp-angular:release0
+```
+Create the above yaml file and save it as pod_one.yml. Make sure you navigate to the directory where the yml file is saved and execute the command 
+
+`kubectl apply -f pod_one.yml`
+
+Once the command is executed successfully, this should give the response as `pod/webapp created`
+
+Now it should display
+
+```
+kubectl get all
+NAME         READY   STATUS    RESTARTS      AGE
+pod/nginx    1/1     Running   1 (28d ago)   34d
+pod/webapp   1/1     Running   0             5m29s
+```
+
+If all working fine, fetch the minikube ip with the command `minikube ip`
+
+On trying to access the above IP from a browser, we will see the page is not accessible. This is because the pod is not accessible to the external world.
+
+![image](https://github.com/user-attachments/assets/6f868c73-fe0c-4904-8d95-3e5d3766b957)
+
+```bash
+Common commands on K8S Pod
+
+#Lists all Pods in the current namespace.
+kubectl get pods
+
+#Shows detailed information about a specific Pod.
+kubectl describe pod <pod-name>
+
+#Retrieves the logs from a Pod’s container.
+kubectl logs <pod-name>
+
+#Executes a command inside a running Pod.
+kubectl exec <pod-name> -- <command>
+
+#Forwards a local port to a Pod.
+kubectl port-forward <pod-name> <local-port>:<pod-port>
+
+#Deletes a specific Pod.
+kubectl delete pod <pod-name>
+
+#Scales the number of Pods for a deployment.
+kubectl scale --replicas=<num> deployment/<deployment-name>
+
+#Copies files between a Pod and local machine.
+kubectl cp <pod-name>:<source-path> <destination-path>
+
+#Creates or updates Pods based on a YAML configuration file.
+kubectl apply -f <yaml-file>
+
+#Retrieves the YAML definition of a specific Pod.
+kubectl get pod <pod-name> -o yaml
+
+#Restarts all Pods in a deployment.
+kubectl rollout restart deployment/<deployment-name>
+
+#Shows resource usage (CPU/memory) for Pods.
+kubectl top pod
+
+```
