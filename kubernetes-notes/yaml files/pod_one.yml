@@ -1,0 +1,21 @@
+# This is a Kubernetes Pod configuration file.
+
+# The `apiVersion` specifies the version of the Kubernetes API used for this resource.
+apiVersion: v1
+
+# The `kind` specifies the type of resource. Here, it is a Pod.
+kind: Pod
+
+# The `metadata` section contains information about the Pod itself.
+# `name` is the unique name assigned to this Pod within the namespace.
+metadata:
+  name: webapp  
+
+# The `spec` section defines the desired state and behavior of the Pod.  
+spec:
+  # `containers` is a list of containers that will run inside the Pod.
+  # Each container specification includes the following properties:
+  # `name` is the unique name for the container within the Pod.
+  containers:
+  - name: webapp
+    image: richardchesterwood/k8s-fleetman-webapp-angular:release0
