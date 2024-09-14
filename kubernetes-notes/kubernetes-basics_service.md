@@ -1,18 +1,18 @@
 **SERVICE**
 
-A Kubernetes (K8s) Service is a fundamental abstraction in Kubernetes that enables reliable networking between different components within a K8S cluster. It provides a stable endpoint for accessing a set of Pods - the smallest deployable units in Kubernetes.
+A Kubernetes (K8s) **Service** is a fundamental abstraction in Kubernetes that enables reliable networking between different components within a K8S cluster. It provides a stable endpoint for accessing a set of Pods - the smallest deployable units in Kubernetes.
 
-When Pods are created, they are assigned unique IP addresses that can change over time as Pods are scaled or restarted. This dynamic nature makes it challenging for other components to consistently communicate with them. A Service addresses this by creating a consistent virtual IP address and DNS name, which remains constant even if the underlying Pods change.
+When Pods are created, they are assigned _unique IP addresses_ that can change over time as Pods are scaled or restarted. This dynamic nature makes it challenging for other components to consistently communicate with them. A Service addresses this by creating a consistent virtual IP address and DNS name, which remains constant even if the underlying Pods change.
 
 There are several types of Services, each serving different purposes:
 
-ClusterIP: The default type, which exposes the Service on a cluster-internal IP. It can only be accessed from within the cluster.
+**ClusterIP**: The default type, which exposes the Service on a cluster-internal IP. It can only be accessed from within the cluster.
 
-NodePort: Exposes the Service on a static port on each Node’s IP address. It allows external access to the Service by requesting <NodeIP>:<NodePort>.
+**NodePort**: Exposes the Service on a static port on each Node’s IP address. It allows external access to the Service by requesting `<NodeIP>:<NodePort>`.
 
-LoadBalancer: Creates an external load balancer (typically provided by cloud providers) that routes traffic to the Service. It provides a single external IP address to access the Service and balances traffic among the Pods.
+**LoadBalancer**: Creates an external load balancer (typically provided by cloud providers) that routes traffic to the Service. It provides a single external IP address to access the Service and balances traffic among the Pods.
 
-ExternalName: Maps a Service to an external DNS name, allowing access to external services via Kubernetes’ DNS.
+**ExternalName**: Maps a Service to an external DNS name, allowing access to external services via Kubernetes’ DNS.
 
 Services use labels and selectors to define how to route traffic to the appropriate Pods. When a request is made to the Service, it is forwarded to one of the Pods that match the selector. This abstraction allows developers to manage applications without worrying about the underlying Pod lifecycle, making deployments and scaling more seamless.
 
