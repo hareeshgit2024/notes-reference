@@ -227,6 +227,9 @@ kubectl apply -f <yaml-file>
 #Retrieves the YAML definition of a specific Pod.
 kubectl get pod <pod-name> -o yaml
 
+#Displays detailed information about the <pod-name> pod, including its IP address, node it is running on, and other extended details.
+kubectl get pod <pod-name> -o wide 
+
 #Restarts all Pods in a deployment.
 kubectl rollout restart deployment/<deployment-name>
 
