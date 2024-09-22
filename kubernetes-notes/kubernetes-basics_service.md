@@ -123,4 +123,47 @@ Load Distribution: The Service distributes traffic evenly across backend Pods, h
 
 </details>
 
+**Kubectl commands associated with K8S service**
 
+```
+#Applies or updates a service based on the configuration defined in a YAML file.
+kubectl apply -f <service-file.yaml>
+
+#Lists all services in the current namespace.
+kubectl get services
+kubectl get svc
+
+#Lists details of a specific service by name.
+kubectl get service <service-name>
+
+#Displays detailed information about a service, including endpoints and selector labels.
+kubectl describe service <service-name>
+
+#Creates a service from a deployment, specifying service type, port, and target port.
+kubectl expose deployment <deployment-name> --type=<service-type> --port=<port> --target-port=<target-port>
+
+#Deletes a specific service, making it unavailable.
+kubectl delete service <service-name>
+
+#Displays the endpoints (IP addresses) associated with a service.
+kubectl get endpoints <service-name>
+
+#Forwards traffic from a local port to a service inside the cluster.
+kubectl port-forward service/<service-name> <local-port>:<service-port>
+
+#Opens an editor to modify a service configuration and apply changes immediately.
+kubectl edit service <service-name>
+
+#Lists all services across all namespaces in the cluster.
+kubectl get services --all-namespaces
+
+#Scales the deployment associated with the service by modifying the number of replicas.
+kubectl scale deployment <deployment-name> --replicas=<count>
+
+#Modifies a service resource using a JSON patch.
+kubectl patch service <service-name> -p '<json-patch>'
+
+#Retrieves logs of the pods associated with a specific service.
+kubectl logs service/<service-name>
+
+```
