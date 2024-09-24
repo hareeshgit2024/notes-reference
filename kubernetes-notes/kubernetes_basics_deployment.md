@@ -266,6 +266,7 @@ spec:
       app: my-app
 ```
 
+
 **LIVENESS and READINESS probe**
 
 Liveness Probe and Readiness Probe are essential features in Kubernetes that help ensure the health and availability of your application. Both work by periodically checking the status of a container, but they serve different purposes:
@@ -278,9 +279,9 @@ Useful for applications that can enter a non-responsive state and need a full re
 
 Types of Liveness Probes:
 
-HTTP Probe: Sends an HTTP GET request to the container and expects a successful response (2xx or 3xx HTTP status).
-TCP Probe: Establishes a TCP connection to the specified port. If the connection is successful, the probe passes.
-Exec Probe: Runs a command inside the container. If the command returns a 0 status code, the container is considered alive.
+- HTTP Probe: Sends an HTTP GET request to the container and expects a successful response (2xx or 3xx HTTP status).
+- TCP Probe: Establishes a TCP connection to the specified port. If the connection is successful, the probe passes.
+- Exec Probe: Runs a command inside the container. If the command returns a 0 status code, the container is considered alive.
 
 ```yaml
 livenessProbe:
@@ -300,9 +301,9 @@ For applications that may temporarily become unresponsive or unavailable but don
 
 Types of Readiness Probes:
 
-HTTP Probe: Similar to the Liveness Probe, it sends an HTTP GET request to check if the application is ready to handle requests.
-TCP Probe: Attempts a TCP connection to the container.
-Exec Probe: Executes a command inside the container to verify readiness
+- HTTP Probe: Similar to the Liveness Probe, it sends an HTTP GET request to check if the application is ready to handle requests.
+- TCP Probe: Attempts a TCP connection to the container.
+- Exec Probe: Executes a command inside the container to verify readiness
 
 ```yaml
 readinessProbe:
