@@ -353,3 +353,62 @@ kubectl expose deployment <deployment-name> --type=<service-type> --port=<port> 
 kubectl autoscale deployment <deployment-name> --min=<min-replicas> --max=<max-replicas> --cpu-percent=<cpu-percent>
 
 ```
+
+When you run `kubectl apply -f deployment.yml`, the following key steps happen in the Kubernetes cluster:
+
+- kubectl sends the Deployment configuration to the API Server.
+- The API Server validates and stores the Deployment in etcd.
+- The Deployment Controller creates/updates a ReplicaSet to match the desired state.
+- The ReplicaSet creates the necessary Pods.
+- The Scheduler schedules the Pods onto suitable worker nodes.
+- Kubelet on the nodes starts the Pods by launching the containers.
+- Networking and service discovery are set up, and health checks begin.
+- The Deployment Controller continuously ensures the desired state is maintained.
+
+![image](https://github.com/user-attachments/assets/9d61d108-bcd5-4093-a160-0e5f32aa2f80)
+
+<details>
+  <summary>More detailed steps of above</summary>
+
+When you run kubectl apply -f deployment.yml in a Kubernetes cluster, it initiates several processes that involve the Kubernetes API, control plane components, and the worker nodes. Here’s a step-by-step explanation of what happens:
+
+1. kubectl sends the request to the API server:
+The kubectl apply -f deployment.yml command sends the contents of the deployment.yml file (which defines a Deployment) to the Kubernetes API Server.
+kubectl communicates with the API server over REST. It performs a POST or PATCH request, depending on whether it is creating a new resource or updating an existing one.
+
+2. API Server processes the request:
+The API Server validates the deployment.yml file by checking its syntax, required fields, and schema (e.g., ensuring you’ve specified kind: Deployment, proper labels, and a valid spec).
+If validation passes, the API Server stores the resource definition (Deployment) in etcd, the distributed key-value store that holds the cluster state.
+The API Server then returns a success message to the client (kubectl), indicating that the request was accepted.
+
+3. The Controller Manager detects the new Deployment:
+The Deployment Controller (part of the Kube Controller Manager) constantly watches the API Server for new or updated Deployments.
+When it detects the new Deployment, it creates a ReplicaSet. A ReplicaSet is responsible for maintaining the desired number of Pods as specified in the Deployment YAML.
+If this is an update to an existing Deployment, the Deployment Controller will adjust the ReplicaSet to reflect the changes.
+
+4. ReplicaSet creates Pods:
+The ReplicaSet Controller, which manages ReplicaSets, watches the API Server and notices that it needs to create new Pods to match the desired replicas specified in the Deployment.
+The ReplicaSet controller then creates the necessary Pods by sending a Pod specification to the API Server.
+
+5. Scheduler schedules the Pods:
+The Kube Scheduler continuously watches the API Server for unscheduled Pods.
+It identifies the newly created Pods from the ReplicaSet and decides which node(s) in the cluster should run each Pod based on available resources, node affinity/anti-affinity rules, and other constraints.
+Once it selects the appropriate node(s), it binds the Pods to those nodes by updating the API Server with scheduling information.
+
+6. Kubelet on the worker nodes starts the Pods:
+Each Kubelet (the agent running on each worker node) watches the API Server for Pods scheduled to run on its node.
+When the Kubelet detects the new Pod, it instructs the container runtime (e.g., Docker or containerd) to pull the container image (if not already present) and start the container(s) defined in the Pod specification.
+The Kubelet also starts any required initialization steps (e.g., mounting volumes, setting up networking).
+
+7. Networking and Service Discovery:
+The network plugin on the node sets up the network interfaces for the Pod, assigning it an IP address so it can communicate with other Pods or Services within the cluster.
+If the Deployment is associated with a Service (or if you later expose it via a Service), the Service will be updated to route traffic to the new Pods.
+
+8. Health checks (Probes):
+Once the Pods are running, the Kubelet starts performing Liveness and Readiness Probes (if defined in the Deployment YAML) to ensure the application inside the container is healthy and ready to serve traffic.
+If a Pod fails the readiness check, the Kubelet won’t add it to the list of ready Pods for the Service, so it won’t receive traffic until it becomes healthy.
+
+9. Ongoing Monitoring and Management:
+The Deployment Controller continuously monitors the Pods. If any of the Pods fail or are killed, the Deployment (through the ReplicaSet) will automatically create new Pods to maintain the desired number of replicas.
+If the Deployment is updated in the future (e.g., new container image), Kubernetes performs a rolling update, where new Pods are gradually created while the old ones are terminated to avoid downtime.
+</details>
