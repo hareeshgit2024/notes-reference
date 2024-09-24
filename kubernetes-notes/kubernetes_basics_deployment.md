@@ -3,7 +3,7 @@
 
 Kubernetes deployment automates the process of managing and scaling applications in a cluster. It involves creating a Deployment object that defines how your app will be managed, including the number of replicas, the container image, and updates.
 
-Defining a deployment object
+**Defining a deployment object**
 
 The deployment is specified in a YAML file, which includes details like the container image, replicas, and port configuration
 
@@ -38,23 +38,18 @@ Use `kubectl get deployments` to check deployment status and `kubectl describe d
 
 In Kubernetes, a Deployment is a higher-level abstraction for managing and scaling applications, while a Pod is the basic execution unit that runs containers.
 
-1. Pod:
+1. **Pod**: Represents a single instance of your running application, but it’s not self-managed.
 - Definition: A Pod is the smallest and simplest Kubernetes object, representing one or more containers that share the same network namespace and storage.
 - Purpose: Pods are created to host your application container(s), along with their runtime environment, like storage volumes and networking.
 - Lifespan: Pods are ephemeral. They can die and won’t be automatically replaced if there’s no controller managing them (like a Deployment).
 - Limitations: Pods don't self-heal or scale by themselves. If a pod crashes, Kubernetes won't automatically replace it unless it's managed by a higher abstraction (such as a Deployment).
 
-2. Deployment:
+2. **Deployment**: Manages multiple replicas of Pods, ensures availability, handles rolling updates, and provides scaling functionality.
 - Definition: A Deployment is a Kubernetes controller that manages Pods and provides declarative updates to them.
 - Purpose: The Deployment specifies the desired state of an application, such as how many replicas (Pods) should run, the container image to use, and how updates should be rolled out.
 - Self-Healing: If a pod fails or gets deleted, the Deployment controller automatically replaces it to maintain the desired state.
 - Rolling Updates: Deployments support rolling updates, which allow you to update an app’s container image without downtime. It rolls out changes progressively, ensuring availability during updates.
 - Scaling: Deployments enable easy horizontal scaling by specifying how many replicas of the pod should run simultaneously.
-  
-Key Differences:
-
-Pod: Represents a single instance of your running application, but it’s not self-managed.
-Deployment: Manages multiple replicas of Pods, ensures availability, handles rolling updates, and provides scaling functionality.
 
 **Suggested Best practices associated with Deployment declaration and execution**
 
@@ -75,6 +70,7 @@ resources:
     cpu: "1"
 
 ```
+
 3. Use health checks (Liveness and Readiness probes)
      Liveness Probe ensures that Kubernetes restarts a container if it gets stuck or crashes.
      Readiness Probe ensures that Kubernetes routes traffic to a Pod only after it’s ready to handle requests.
@@ -93,8 +89,10 @@ readinessProbe:
   initialDelaySeconds: 10
   periodSeconds: 5
 ```
+
 4. Configure Rolling Updates with a Strategy
    Use a rolling update strategy to prevent downtime when updating your application. Control the speed of the rollout by configuring maxSurge (extra Pods created during update) and maxUnavailable (Pods that can be unavailable).
+   
 ```yaml
 strategy:
   type: RollingUpdate
@@ -102,36 +100,45 @@ strategy:
     maxSurge: 1
     maxUnavailable: 0
 ```
+
 5. Set up Autoscaling
    Configure Horizontal Pod Autoscaler (HPA) to automatically adjust the number of Pods based on CPU/memory usage or custom metrics. This improves availability and optimizes resource utilization.
    `kubectl autoscale deployment my-app --cpu-percent=80 --min=2 --max=10`
 6. Use Labels and Selectors
    Apply labels to your Pods for better organization and management. Ensure that the selector in the Deployment matches these labels to correctly identify Pods managed by the Deployment.
+
 ```yaml
 labels:
   app: my-app
   environment: production
 ```
+
 7. Ensure Immutable Configurations
    Store configurations (e.g., environment variables, secrets, and config maps) outside the container image using ConfigMaps and Secrets to make changes without modifying the deployment.
+
 ```yaml
 envFrom:
   - configMapRef:
       name: my-app-config
 ```
+
 8. Enable Pod Disruption Budgets (PDBs)
    Define a Pod Disruption Budget to limit the number of Pods that can be down during voluntary disruptions (like node maintenance) and ensure high availability.
+
 ```yaml
 spec:
   minAvailable: 2
 ```
+
 9. Manage Secrets Securely
    Store sensitive data, like API keys and passwords, in Kubernetes Secrets, not directly in the deployment YAML or container image.
 
+---
 <details>
+  
   <summary>Real life example - Pods, Deployment, Service</summary>
 
-  Let’s use the analogy of a Tea Restaurant to explain Pods, Deployments, and Services in Kubernetes, relating each concept to real-life operations in the restaurant.
+Let’s use the analogy of a Tea Restaurant to explain Pods, Deployments, and Services in Kubernetes, relating each concept to real-life operations in the restaurant.
 
 1. Pods (Tea Chef and Tea Setup)
 Real Life: Think of a Pod as a chef who makes tea at the restaurant. The pod is like the chef’s workstation, including all the ingredients, equipment, and setup (teapots, kettles, tea leaves, water, etc.).
@@ -168,6 +175,9 @@ Deployment (Management) oversees the operation, ensuring the right number of Pod
 Service (Waiter) is the point of access for customers (clients) to get their tea (services). It handles routing to the right Pods (chefs) and balances the load among them.
 
 </details>
+
+---
+
 A sample deployment yaml file for reference
 
 ```yaml
@@ -367,6 +377,8 @@ When you run `kubectl apply -f deployment.yml`, the following key steps happen i
 
 ![image](https://github.com/user-attachments/assets/9d61d108-bcd5-4093-a160-0e5f32aa2f80)
 
+---
+
 <details>
   <summary>More detailed steps of above</summary>
 
@@ -412,3 +424,5 @@ If a Pod fails the readiness check, the Kubelet won’t add it to the list of re
 The Deployment Controller continuously monitors the Pods. If any of the Pods fail or are killed, the Deployment (through the ReplicaSet) will automatically create new Pods to maintain the desired number of replicas.
 If the Deployment is updated in the future (e.g., new container image), Kubernetes performs a rolling update, where new Pods are gradually created while the old ones are terminated to avoid downtime.
 </details>
+
+---
