@@ -8,7 +8,7 @@ The PV can be backed by different storage types like NFS, iSCSI, cloud providers
 
 **Lifecycle**: PVs exist beyond the lifecycle of individual pods. This allows data to be preserved even if pods are removed or restarted.
 
-![image](https://github.com/user-attachments/assets/1f19ecca-20e0-46ab-997f-745a14276eb2)
+<img src="https://github.com/user-attachments/assets/1f19ecca-20e0-46ab-997f-745a14276eb2" alt="PV_PVC image" width="550"/>
 
 In Kubernetes, Persistent Volumes (PVs) and Persistent Volume Claims (PVCs) work together to provide storage for pods that persists beyond the lifecycle of individual pods. 
 On looking at the step-by-step process of how PV and PVC interact:
@@ -289,3 +289,44 @@ reclaimPolicy: Retain                                       # Retain data after 
 volumeBindingMode: Immediate                                # Volume binding mode
 ```
 
+Most commonly used kubectl command on PV and PVC
+
+```bash
+
+# Used for creating a PV using a YAML manifest
+kubectl apply -f pv.yaml
+
+# Used for listing all available Persistent Volumes
+kubectl get pv
+
+# Used for getting detailed information about a specific PV
+kubectl describe pv <pv-name>
+
+# Used for deleting a specific PV
+kubectl delete pv <pv-name>
+
+# Used for getting more detailed information in table format about PVs
+kubectl get pv -o wide
+
+# Used for creating a PVC using a YAML manifest
+kubectl apply -f pvc.yaml
+
+# Used for listing all PVCs in the current namespace
+kubectl get pvc
+
+# Used for getting detailed information about a specific PVC
+kubectl describe pvc <pvc-name>
+
+# Used for deleting a specific PVC
+kubectl delete pvc <pvc-name>
+
+# Used for checking if the PVC is bound to a specific PV
+kubectl get pvc <pvc-name> -o wide
+
+# Used for editing a PVC inline
+kubectl edit pvc <pvc-name>
+
+# Used for viewing the status of PVCs and their bound PVs
+kubectl get pvc,pv
+
+```
