@@ -71,7 +71,7 @@ If a tea stall runs out of ingredients or is damaged, the brand ensures that a n
 
 ---
 
-Command kubectl commands used associated to Replicaset
+Common kubectl commands used associated to Replicaset
 
 ```bash
 # This is used to create a ReplicaSet from a YAML file
