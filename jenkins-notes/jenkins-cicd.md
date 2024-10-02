@@ -7,6 +7,8 @@ How to install Jenkins in your windows machine, click here to get the step -> [C
 
 ---
 
+**I . Initial Jenkins setup**
+
 Alternative option is to use the Docker images to run. Steps to follow.
 
 **1. Pull the docker image**
@@ -14,7 +16,7 @@ Alternative option is to use the Docker images to run. Steps to follow.
 ```bash
 docker pull jenkins/jenkins
 ```
-
+Best practice is to use a specific version while pulling a docker image from the repository.
 you should see multiple layers of jenkins image getting downloaded
 
 ![image](https://github.com/user-attachments/assets/9f55de0e-98cf-4b16-a154-76d861f9d15a)
@@ -73,6 +75,76 @@ The above command is used to run a Docker container for Jenkins with specific co
 
 In the web browser, you can access the url `http://localhost:8080` and complete the setup.
 Unlock jenkins with the initial admin password generated during the first startup.
+
+![image](https://github.com/user-attachments/assets/9c7ca7f3-6037-476a-8829-95cfcc1d21b2)
+
+
+If you are using docker, use the command `docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword`
+
+If installed directly into the windows system, use `C:\Users\<YourUsername>\.jenkins\secrets\initialAdminPassword`
+
+Once everything is ready, the dashboard should looklike
+
+![image](https://github.com/user-attachments/assets/b6d56219-0601-4a77-915a-4f4227025388)
+
+---
+
+**II. Setting up Pipeline**
+
+---
+<details>
+
+  <summary>Guidance for Github repository setup</summary>
+
+**Step 1: Create a GitHub Repository**
+
+1. Go to GitHub.
+2. Log in to your account.
+3. Click on the + icon in the top right corner and select New repository.
+4. Fill in the repository name, description (optional), and choose visibility (public or private).
+5. Click Create repository.
+   
+**Step 2: Initialize Git in Your Project**
+1. Open your terminal or command prompt.
+2. Navigate to your Java application directory:
+   ```bash
+   cd /path/to/your/java/application
+  ```
+3. Initialize the new git repository
+  ```bash
+  git init
+  ```
+
+**Step 3: Add Remote Repository**
+1. Add the above git hub repository as a remote
+   ```bash
+   git remote add origin https://github.com/yourusername/your-repo-name.git
+   ```
+
+**Step 4: Add Files and Commit**
+1. Add your project files:
+  ```bash
+  git add .
+  ```
+
+2. Commit your changes:
+
+  ```bash
+  git commit -m "Initial commit"
+  ```
+
+**Step 5: Push to GitHub**
+
+1. Push your local repository to GitHub:
+
+  ```bash
+  git push -u origin main
+  ```
+(If your default branch is master, use master instead of main.)
+
+</details>
+
+Github repository for your project should be now available in your github
 
 ---
 
