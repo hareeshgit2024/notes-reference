@@ -1,5 +1,5 @@
 
-**JENKINS**
+# JENKINS
 
 We shall see how we can build a CI CD pipeline in Jenkins.
 
@@ -150,5 +150,338 @@ Once everything is ready, the dashboard should looklike
 
 Github repository for your project should be now available in your github
 
+
+Sharing a sample Jenkinsfile that follows best practices for a typical CI/CD pipeline with multiple stages for Build, Development, Testing, Code Scanning (with SonarQube), and various other stages. 
+
+The pipeline also incorporates concepts like parallel testing, failure handling, and best practices for maintainability.
+
+```groovy
+
+pipeline {
+    agent {
+        label 'master' // Specify the agent label, e.g., master or custom agent label
+    }
+
+    environment {
+        CONFIG = readYaml(file: 'config.yml') // Load external config file
+        SONARQUBE_URL = "http://sonarqube.yourdomain.com"
+        SONARQUBE_PROJECT_KEY = "your-project-key"
+        SONARQUBE_TOKEN = credentials('sonar-token') // SonarQube token stored in Jenkins credentials
+    }
+
+    options {
+        timeout(time: 60, unit: 'MINUTES') // Timeout after 60 minutes
+        timestamps()                       // Add timestamps to the console output
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                git url: 'https://github.com/yourusername/your-repo-name.git', branch: 'main'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Building the project with Maven..."
+                sh "mvn clean package -Dmaven.test.skip=${CONFIG.build.skipTests}"
+            }
+            post {
+                failure {
+                    echo "Build failed!"
+                    emailext to: "${CONFIG.notifications.email}",
+                        subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                        body: "Build failed. Check console output at ${env.BUILD_URL}"
+                }
+            }
+        }
+
+        stage('Test') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        echo "Running unit tests..."
+                        sh "mvn test -Dsuite=${CONFIG.tests.testSuites[0]}"
+                    }
+                }
+                stage('Integration Tests') {
+                    steps {
+                        echo "Running integration tests..."
+                        sh "mvn integration-test -Dsuite=${CONFIG.tests.testSuites[1]}"
+                    }
+                }
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml' // Publish test results
+                }
+            }
+        }
+
+        stage('Code Scanning with SonarQube') {
+            steps {
+                echo "Running SonarQube analysis..."
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                    mvn sonar:sonar \
+                        -Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
+                        -Dsonar.host.url=${SONARQUBE_URL} \
+                        -Dsonar.login=${SONARQUBE_TOKEN}
+                    """
+                }
+            }
+            post {
+                always {
+                    echo "SonarQube scan completed."
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                echo "Checking SonarQube Quality Gate..."
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Deploy to Development') {
+            when {
+                branch 'development' // Only run for development branch
+            }
+            steps {
+                echo "Deploying to Development Environment..."
+                deployToKubernetes('development') // Custom function for K8s deployment
+            }
+        }
+
+        stage('Deploy to Staging') {
+            when {
+                branch 'staging' // Only run for staging branch
+            }
+            steps {
+                echo "Deploying to Staging Environment..."
+                deployToKubernetes('staging') // Custom function for K8s deployment
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                branch 'main' // Only run for the main branch
+            }
+            steps {
+                echo "Deploying to Production Environment..."
+                deployToKubernetes('production') // Custom function for K8s deployment
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                echo "Cleaning up..."
+                cleanWs() // Clean up workspace after build
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed!"
+        }
+        success {
+            emailext to: "${CONFIG.notifications.email}",
+                subject: "Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "The pipeline was successful. Check the details at ${env.BUILD_URL}"
+        }
+        failure {
+            emailext to: "${CONFIG.notifications.email}",
+                subject: "Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "The pipeline failed. Check the console output at ${env.BUILD_URL}"
+        }
+        unstable {
+            emailext to: "${CONFIG.notifications.email}",
+                subject: "Unstable: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "The pipeline is unstable. Check the details at ${env.BUILD_URL}"
+        }
+    }
+}
+
+def deployToKubernetes(env) {
+    echo "Deploying to Kubernetes environment: ${env}"
+    sh """
+    kubectl --namespace=${CONFIG.kubernetes.namespace} \
+    set image deployment/${CONFIG.kubernetes.deploymentName} \
+    ${CONFIG.kubernetes.deploymentName}=${CONFIG.kubernetes.containerImage}
+    """
+}
+
+```
+
+The below is the project structure of a Java application, Jenkinsfile should come under the root structure of the project.
+
+![image](https://github.com/user-attachments/assets/bee35867-d010-4094-a329-504283004128)
+
 ---
+
+**III. Setting up Pipeline**
+
+---
+
+Out of many suggested solutions, a high-level solution for creating a reusable pipeline script could be structured as follows:
+
+**1. Use of Environment Variables**
+Configure external properties through environment variables. Each team can define their unique environment variables, such as JAVA_VERSION, NAMESPACE, etc., in their pipeline configuration file or CI/CD system settings.
+
+```yaml
+pipeline {
+    agent any
+
+    environment {
+        // Define environment variables for reusability
+        APP_NAME = 'my-springboot-app'
+        GIT_URL = 'https://github.com/your-username/your-repository.git'
+        BUILD_COMMAND = './gradlew build' // Or use 'mvn clean install' for Maven projects
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from the repository
+                git branch: 'main', url: "${GIT_URL}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Run the build command dynamically based on environment variable
+                sh "${BUILD_COMMAND}"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run tests
+                sh './gradlew test'  // Adjust based on your project's test command
+            }
+        }
+
+        stage('Code Scanning with SonarQube') {
+            steps {
+                // Placeholder for SonarQube code scanning step
+                echo 'SonarQube scanning...'
+                // You can add sonar-scanner commands here
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy the application (this is a placeholder step)
+                echo "Deploying ${APP_NAME} to the environment..."
+                // You can add actual deployment commands here
+            }
+        }
+    }
+
+    post {
+        always {
+            // Clean up workspace after build
+            cleanWs()
+        }
+    }
+}
+
+```
+
+**_Environment Variables:_**
+
+APP_NAME, GIT_URL, and BUILD_COMMAND are defined as environment variables and used in different stages. This makes the pipeline reusable for different projects by simply modifying the environment variables.
+
+**_Reusability:_**
+
+By changing the environment variables, you can reuse this same pipeline for multiple Spring Boot or other Java-based projects.
+
+**2. External Config Files**
+
+Keep the external configuration in YAML or JSON files, which the pipeline script can load at runtime.
+
+The above Jenkinsfile can be converted into a model where it reads values from an external configuration file (such as config.yml) for reusability across different projects.
+
+a. External Config
+
+`config.yml`
+
+```yaml
+app:
+  name: "my-springboot-app"
+  git_url: "https://github.com/your-username/your-repository.git"
+  build_command: "./gradlew build"
+  test_command: "./gradlew test"
+  sonar_command: "sonar-scanner"
+  deploy_command: "echo Deploying to environment"
+```
+
+`Jenkinsfile Using External Config:`
+
+You can use the readYaml function provided by the Jenkins Pipeline Utility Steps plugin to load this config.yml file in your Jenkinsfile.
+
+```yaml
+
+pipeline {
+    agent any
+
+    environment {
+        // Loading configuration from external YAML file
+        CONFIG = readYaml file: 'config.yml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from the repository defined in the YAML file
+                git branch: 'main', url: "${CONFIG.app.git_url}"
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Run the build command from the YAML file
+                sh "${CONFIG.app.build_command}"
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Run the test command from the YAML file
+                sh "${CONFIG.app.test_command}"
+            }
+        }
+
+        stage('Code Scanning with SonarQube') {
+            steps {
+                // Run the SonarQube command from the YAML file
+                sh "${CONFIG.app.sonar_command}"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Run the deploy command from the YAML file
+                sh "${CONFIG.app.deploy_command}"
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
+
+# Make sure you have the Pipeline Utility Steps plugin installed in Jenkins to use readYaml.
+
+```
+
+To reuse this pipeline for different applications, simply change the values in config.yml for each project (like git_url, build_command, etc.), and the pipeline will adapt accordingly without needing to modify the Jenkinsfile itself.
 
