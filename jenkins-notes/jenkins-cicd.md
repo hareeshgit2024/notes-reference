@@ -105,6 +105,7 @@ Once everything is ready, the dashboard should looklike
 5. Click Create repository.
    
 **Step 2: Initialize Git in Your Project**
+
 1. Open your terminal or command prompt.
 2. Navigate to your Java application directory:
    ```bash
@@ -116,13 +117,16 @@ Once everything is ready, the dashboard should looklike
   ```
 
 **Step 3: Add Remote Repository**
+
 1. Add the above git hub repository as a remote
    ```bash
    git remote add origin https://github.com/yourusername/your-repo-name.git
    ```
 
 **Step 4: Add Files and Commit**
+
 1. Add your project files:
+   
   ```bash
   git add .
   ```
